@@ -44,12 +44,13 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (let i = 0; i < snake.length; i++) {
-        ctx.fillStyle = (i === 0) ? "green" : "white";
+        ctx.fillStyle = (i === 0) ? "#B19470" : "#fff"; // Snake colour changed to #B19470
         ctx.fillRect(snake[i].x, snake[i].y, box, box);
         ctx.strokeStyle = "black";
         ctx.strokeRect(snake[i].x, snake[i].y, box, box);
     }
 
+    // Food colour remains red
     ctx.fillStyle = "red";
     ctx.fillRect(food.x, food.y, box, box);
 
@@ -115,59 +116,3 @@ function togglePause() {
 document.getElementById("pauseButton").addEventListener("click", togglePause);
 
 let game = setInterval(draw, 100);
-
-function draw() {
-    if (gamePaused) {
-        return;
-    }
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    for (let i = 0; i < snake.length; i++) {
-        ctx.fillStyle = (i === 0) ? "#B19470" : "#fff"; // Snake colour changed to #B19470
-        ctx.fillRect(snake[i].x, snake[i].y, box, box);
-        ctx.strokeStyle = "black";
-        ctx.strokeRect(snake[i].x, snake[i].y, box, box);
-    }
-
-    // Food colour remains red
-    ctx.fillStyle = "red";
-    ctx.fillRect(food.x, food.y, box, box);
-
-    let snakeX = snake[0].x;
-    let snakeY = snake[0].y;
-
-    if (d == "LEFT") snakeX -= box;
-    if (d == "UP") snakeY -= box;
-    if (d == "RIGHT") snakeX += box;
-    if (d == "DOWN") snakeY += box;
-
-    if (snakeX < 0) snakeX = canvas.width - box;
-    if (snakeX >= canvas.width) snakeX = 0;
-    if (snakeY < 0) snakeY = canvas.height - box;
-    if (snakeY >= canvas.height) snakeY = 0;
-
-    if (snakeX == food.x && snakeY == food.y) {
-        score++;
-        food = generateFoodPosition();
-    } else {
-        snake.pop();
-    }
-
-    let newHead = {
-        x: snakeX,
-        y: snakeY
-    };
-
-    if (collision(newHead, snake)) {
-        clearInterval(game);
-        displayBanner("Game Over! Your score is " + score);
-        setTimeout(() => {
-            location.reload(); // Reload the page to restart the game
-        }, 3000); // 3 seconds delay before reloading
-    }
-
-    snake.unshift(newHead);
-
-    document.getElementById("score").innerHTML = "Score: " + score;
-}
