@@ -4,17 +4,19 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: black;
-    color: white;
+    font-family: 'Arial', sans-serif;
+    background-color: #1a1a1a; 
 }
 
+h1 {
+    color: aliceblue;
+}
 .container {
     text-align: center;
-    background-color: #333;
+    background-color: rgba(0, 0, 0, 0.8); 
     padding: 40px;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1); 
 }
 
 .board {
@@ -22,20 +24,46 @@ body {
     grid-template-columns: repeat(3, 100px);
     gap: 5px;
     margin-bottom: 20px;
-    background-color: black;
 }
 
 .cell {
     width: 100px;
     height: 100px;
-    border: 1px solid white;
+    border: none;
+    background-color: #333; 
     font-size: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    cursor: pointer;
+    color: #fff; 
 }
 
-.cell.winner {
-    background-color: rgba(0, 128, 0, 0.5); 
+.cell:hover {
+    background-color: #555; 
+}
+
+#status {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #fff; 
+}
+
+#restart {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#restart:hover {
+    background-color: #45a049;
+}
+
+.winner {
+    background-color: #4CAF50;
+    color: white;
 }
