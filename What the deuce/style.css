@@ -1,0 +1,24 @@
+/* Basic reset for the body */
+body {
+    font-family: 'Permanent Marker', cursive; /* Use the 'Permanent Marker' font */
+    margin: 0;
+    height: 100vh;
+    background-color: #f4f4f4; /* Default background color */
+    display: flex;
+    justify-content: center;  /* Centers horizontally */
+    align-items: center;      /* Centers vertically */
+    transition: background-color 0.3s ease; /* Smooth transition for background color change */
+}
+
+/* Container for the word */
+.word-container {
+    display: flex;
+    font-size: 100px; /* Set the font size to 40px */
+}
+
+/* Individual letter styles */
+.letter {
+    color: black; /* Keep the letters black */
+    cursor: pointer;
+}
+

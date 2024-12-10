@@ -1,0 +1,45 @@
+/* Basic reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Full page styling */
+body {
+    width: 100%;
+    height: 100vh;
+    background-color: #000; /* Default dark background */
+    overflow: hidden; /* Hide scrollbars */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: default; /* Show the default cursor */
+}
+
+/* Container for the falling emojis */
+.rain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Emojis should not interfere with user interaction */
+}
+
+/* Style for the fire emoji */
+.emoji {
+    position: absolute;
+    font-size: 30px; /* Medium size for the emoji */
+    color: #FF4500; /* Fire color (orange/red) */
+    animation: fall linear infinite;
+    will-change: transform; /* Optimize rendering for animation */
+}
+
+/* Fall animation */
+@keyframes fall {
+    to {
+        transform: translateY(100vh); /* Emojis fall to the bottom */
+    }
+}
