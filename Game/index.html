@@ -1,29 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Tic-Tac-Toe Game</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameHub</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
-<div class="container">
-    <h1>Tic-Tac-Toe</h1>
-    <div class="board">
-        <div class="cell" id="0"></div>
-        <div class="cell" id="1"></div>
-        <div class="cell" id="2"></div>
-        <div class="cell" id="3"></div>
-        <div class="cell" id="4"></div>
-        <div class="cell" id="5"></div>
-        <div class="cell" id="6"></div>
-        <div class="cell" id="7"></div>
-        <div class="cell" id="8"></div>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">GameHub</div>
+        <ul class="nav-links">
+            <li><a href="#" onclick="showGame('tictactoe')">Tic Tac Toe</a></li>
+            <li><a href="#" onclick="showGame('snake')">Snake</a></li>
+        </ul>
+    </nav>
+
+    <!-- Tic Tac Toe Section -->
+    <div id="tictactoe" class="game-container">
+        <div class="scoreboard">
+            <div class="score-item"><span>Player</span> <span id="player">0</span></div>
+            <div class="score-item"><span>Tie</span> <span id="tie">0</span></div>
+            <div class="score-item"><span>Computer</span> <span id="computer">0</span></div>
+        </div>
+        <div class="grid-container">
+            <div class="grid-item" data-index="0"></div>
+            <div class="grid-item" data-index="1"></div>
+            <div class="grid-item" data-index="2"></div>
+            <div class="grid-item" data-index="3"></div>
+            <div class="grid-item" data-index="4"></div>
+            <div class="grid-item" data-index="5"></div>
+            <div class="grid-item" data-index="6"></div>
+            <div class="grid-item" data-index="7"></div>
+            <div class="grid-item" data-index="8"></div>
+        </div>
     </div>
-    <div id="status">Player X's turn</div>
-    <button id="restart">Restart Game</button>
-</div>
 
-<script src="script.js"></script>
+    <!-- Snake Game Section -->
+    <div id="snake" class="game-container2" style="display: none;">
+        <h1>Snake Game</h1>
+        <canvas id="gameCanvas2" width="400" height="400"></canvas>
+        <button id="pauseButton2">Pause</button>
+        <div id="score2">Score: 0</div>
+    </div>
 
+    <script src="script.js"></script>
 </body>
+
 </html>
