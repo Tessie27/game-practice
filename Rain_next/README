@@ -1,0 +1,25 @@
+# 🔥 Fire Emoji Rain
+
+A beautiful and interactive Next.js application that creates a stunning fire emoji rain effect. Move your mouse around the screen and watch as the fiery emojis gracefully dance around your cursor!
+
+## ✨ Features
+
+- **🔥 Dynamic Fire Rain**: Continuous stream of falling fire emojis with realistic animation
+- **🎯 Interactive Mouse Avoidance**: Emojis smoothly move around your cursor in real-time
+- **⚡ Performance Optimized**: Efficient rendering with requestAnimationFrame and optimized collision detection
+- **🎨 Smooth Animations**: Natural falling motion with horizontal drift and fade effects
+- **📱 Responsive Design**: Works perfectly on all screen sizes
+- **♿ Accessible**: Respects reduced motion preferences
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 16.8 or later
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd fire-emoji-rain
