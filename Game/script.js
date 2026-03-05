@@ -1,95 +1,108 @@
-// Function to switch between games
+// ===== SHARED CONSTANTS =====
+const WINNING_COMBINATIONS = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+];
+
+// ===== NAV =====
 function showGame(game) {
-    // Hide both games initially
     document.getElementById('tictactoe').style.display = 'none';
     document.getElementById('snake').style.display = 'none';
 
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
     if (game === 'tictactoe') {
-        // Show Tic Tac Toe
-        document.getElementById('tictactoe').style.display = 'block';
+        document.getElementById('tictactoe').style.display = 'flex';
+        document.getElementById('nav-tictactoe').classList.add('active');
     } else if (game === 'snake') {
-        // Show Snake game
-        document.getElementById('snake').style.display = 'block';
-        startSnakeGame();  // Initialize Snake game when switched to snake
+        document.getElementById('snake').style.display = 'flex';
+        document.getElementById('nav-snake').classList.add('active');
+        initSnakeGame();
     }
 }
 
 
-// Game state variables for Tic Tac Toe
-let board = ['', '', '', '', '', '', '', '', ''];  // Empty 3x3 grid
+// ===========================
+// TIC TAC TOE
+// ===========================
+let board = ['', '', '', '', '', '', '', '', ''];
 let gameOver = false;
 let playerScore = 0;
 let tieScore = 0;
 let computerScore = 0;
-let isPlayerTurn = true;  // Keeps track of whose turn it is (true = player, false = computer)
+let isPlayerTurn = true;
 
 const gridItems = document.querySelectorAll('.grid-item');
 const playerScoreElement = document.getElementById('player');
 const tieScoreElement = document.getElementById('tie');
 const computerScoreElement = document.getElementById('computer');
+const tttStatus = document.getElementById('ttt-status');
 
-// Event listener for player clicks
 gridItems.forEach(item => {
     item.addEventListener('click', handlePlayerMove);
 });
 
-// Function to handle player move
+function setStatus(msg, type = '') {
+    tttStatus.textContent = msg;
+    tttStatus.className = 'ttt-status' + (type ? ' ' + type : '');
+}
+
 function handlePlayerMove(event) {
-    if (gameOver || !isPlayerTurn) return;  // Ignore clicks if the game is over or it's not the player's turn
+    if (gameOver || !isPlayerTurn) return;
 
     const index = event.target.getAttribute('data-index');
-    
-    if (board[index]) return;  // Prevent click if the cell is already taken
+    if (board[index]) return;
 
-    // Mark the player's move
     board[index] = 'X';
     event.target.textContent = 'X';
+    event.target.classList.add('x-mark', 'taken');
 
-    if (checkWinner('X')) {
+    const winCells = getWinningCells('X');
+    if (winCells) {
         playerScore++;
         updateScoreboard();
+        highlightWinner(winCells);
+        setStatus('You win!', 'win');
         gameOver = true;
-        setTimeout(resetGame, 1000);  // Delay before resetting for better UX
+        setTimeout(resetGame, 1400);
         return;
     }
 
-    if (board.every(cell => cell !== '') && !checkWinner('X') && !checkWinner('O')) {
+    if (board.every(cell => cell !== '')) {
         tieScore++;
         updateScoreboard();
+        setStatus("It's a tie!", 'tie');
         gameOver = true;
-        setTimeout(resetGame, 1000);  // Delay before resetting for better UX
+        setTimeout(resetGame, 1400);
         return;
     }
 
     isPlayerTurn = false;
-    setTimeout(handleComputerMove, 500);  // Give a brief delay before computer moves
+    setStatus("CPU is thinking…");
+    setTimeout(handleComputerMove, 500);
 }
 
-// Function for computer's turn (Medium AI)
 function handleComputerMove() {
-    if (gameOver || isPlayerTurn) return;  // Ignore if game is over or it's the player's turn
+    if (gameOver || isPlayerTurn) return;
 
-    const availableMoves = getAvailableMoves();
-
-    // Check for winning or blocking moves
     const winningMove = findWinningMove('O');
-    if (winningMove !== -1) {
-        makeMove(winningMove, 'O');
-        return;
-    }
+    if (winningMove !== -1) { makeMove(winningMove, 'O'); return; }
 
     const blockingMove = findWinningMove('X');
-    if (blockingMove !== -1) {
-        makeMove(blockingMove, 'O');
-        return;
-    }
+    if (blockingMove !== -1) { makeMove(blockingMove, 'O'); return; }
 
-    // No immediate winning or blocking move? Make a random move
-    const randomIndex = availableMoves[Math.floor(Math.random() * availableMoves.length)];
-    makeMove(randomIndex, 'O');
+    // Prefer center, then corners, then random
+    const preferred = [4, 0, 2, 6, 8, 1, 3, 5, 7];
+    const move = preferred.find(i => board[i] === '');
+    makeMove(move, 'O');
 }
 
-// Get available moves (empty cells)
 function getAvailableMoves() {
     return board.reduce((acc, curr, idx) => {
         if (!curr) acc.push(idx);
@@ -97,121 +110,114 @@ function getAvailableMoves() {
     }, []);
 }
 
-// Function to find a winning move for a given player (returns index of the winning move or -1 if no winning move)
 function findWinningMove(player) {
-    const winningCombinations = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6]
-    ];
-
-    for (const combination of winningCombinations) {
-        const [a, b, c] = combination;
+    for (const combo of WINNING_COMBINATIONS) {
+        const [a, b, c] = combo;
         const values = [board[a], board[b], board[c]];
         const emptyIndex = values.indexOf('');
-        
-        if (values.filter(val => val === player).length === 2 && emptyIndex !== -1) {
-            return combination[emptyIndex];  // Return the index of the empty spot
+        if (values.filter(v => v === player).length === 2 && emptyIndex !== -1) {
+            return combo[emptyIndex];
         }
     }
-    return -1;  // No winning move found
+    return -1;
 }
 
-// Function to make a move on the board
 function makeMove(index, player) {
     board[index] = player;
     gridItems[index].textContent = player;
+    gridItems[index].classList.add(player === 'X' ? 'x-mark' : 'o-mark', 'taken');
 
-    if (checkWinner(player)) {
+    const winCells = getWinningCells(player);
+    if (winCells) {
         player === 'X' ? playerScore++ : computerScore++;
         updateScoreboard();
+        highlightWinner(winCells);
+        setStatus(player === 'X' ? 'You win!' : 'CPU wins!', player === 'X' ? 'win' : 'lose');
         gameOver = true;
-        setTimeout(resetGame, 1000);
+        setTimeout(resetGame, 1400);
         return;
     }
 
-    if (board.every(cell => cell !== '') && !checkWinner('X') && !checkWinner('O')) {
+    if (board.every(cell => cell !== '')) {
         tieScore++;
         updateScoreboard();
+        setStatus("It's a tie!", 'tie');
         gameOver = true;
-        setTimeout(resetGame, 1000);
+        setTimeout(resetGame, 1400);
         return;
     }
 
     isPlayerTurn = true;
+    setStatus("Your turn");
 }
 
-// Function to check for a winner
-function checkWinner(player) {
-    const winningCombinations = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6]
-    ];
-
-    return winningCombinations.some(combination => {
-        return combination.every(index => board[index] === player);
-    });
+function getWinningCells(player) {
+    for (const combo of WINNING_COMBINATIONS) {
+        if (combo.every(i => board[i] === player)) return combo;
+    }
+    return null;
 }
 
-// Function to update the scoreboard
+function highlightWinner(cells) {
+    cells.forEach(i => gridItems[i].classList.add('winner'));
+}
+
 function updateScoreboard() {
     playerScoreElement.textContent = playerScore;
     tieScoreElement.textContent = tieScore;
     computerScoreElement.textContent = computerScore;
 }
 
-// Reset the game board after a round ends
 function resetGame() {
     board = ['', '', '', '', '', '', '', '', ''];
     gameOver = false;
-
-    gridItems.forEach(item => item.textContent = '');  // Clear grid
-
-    // Switch turn for next round
-    isPlayerTurn = !isPlayerTurn;  // Switch player/computer turn
-
+    gridItems.forEach(item => {
+        item.textContent = '';
+        item.className = 'grid-item';
+    });
+    isPlayerTurn = !isPlayerTurn;
     if (!isPlayerTurn) {
-        setTimeout(handleComputerMove, 500);  // Computer plays first after reset
+        setStatus("CPU is thinking…");
+        setTimeout(handleComputerMove, 500);
+    } else {
+        setStatus("Your turn");
     }
 }
 
-// Snake Game Logic
+
+// ===========================
+// SNAKE GAME
+// ===========================
 let canvas = document.getElementById("gameCanvas2");
 let ctx = canvas.getContext("2d");
 
-let box = 20; // Original box size
-let snake = [];
-snake[0] = { x: 10 * box, y: 10 * box };
-let food = generateFoodPosition(); // Original food position
-let score = 0;
-let gamePaused = false;
+let box = 20;
+let snake, food, snakeScore, gamePaused, snakeGameInterval, snakeDir, snakeStarted;
 
-let d;
-document.addEventListener("keydown", direction);
+function initSnakeGame() {
+    // Clear any existing interval first
+    clearInterval(snakeGameInterval);
 
-function direction(event) {
-    if (event.keyCode == 37 && d != "RIGHT") {
-        d = "LEFT";
-    } else if (event.keyCode == 38 && d != "DOWN") {
-        d = "UP";
-    } else if (event.keyCode == 39 && d != "LEFT") {
-        d = "RIGHT";
-    } else if (event.keyCode == 40 && d != "UP") {
-        d = "DOWN";
-    } else if (event.keyCode == 80) { // 'P' key for pause/resume
-        togglePause();
-    }
+    snake = [{ x: 10 * box, y: 10 * box }];
+    food = generateFoodPosition();
+    snakeScore = 0;
+    gamePaused = false;
+    snakeDir = null;
+    snakeStarted = false;
+
+    document.getElementById('score2').textContent = 'Score: 0';
+    document.getElementById('banner').style.display = 'none';
+    document.getElementById('snake-start-msg').style.opacity = '1';
+
+    const pauseBtn = document.getElementById('pauseButton2');
+    pauseBtn.textContent = 'Pause';
+    pauseBtn.disabled = true;
+
+    // Draw initial static frame
+    drawSnakeFrame();
+
+    // Game loop — will only move once snakeStarted is true
+    snakeGameInterval = setInterval(draw, 100);
 }
 
 function generateFoodPosition() {
@@ -221,88 +227,122 @@ function generateFoodPosition() {
             x: Math.floor(Math.random() * 20) * box,
             y: Math.floor(Math.random() * 20) * box
         };
-    } while (collision(position, snake));
+    } while (snake && collision(position, snake));
     return position;
 }
 
-function draw() {
-    if (gamePaused) {
-        return;
+function drawSnakeFrame() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw food
+    ctx.fillStyle = "#ef4444";
+    ctx.beginPath();
+    ctx.arc(food.x + box / 2, food.y + box / 2, box / 2 - 1, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw snake
+    for (let i = 0; i < snake.length; i++) {
+        ctx.fillStyle = i === 0 ? '#818cf8' : '#6366f1';
+        ctx.beginPath();
+        ctx.roundRect(snake[i].x + 1, snake[i].y + 1, box - 2, box - 2, 4);
+        ctx.fill();
     }
+}
+
+function draw() {
+    if (gamePaused || !snakeStarted) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    for (let i = 0; i < snake.length; i++) {
-        ctx.fillStyle = (i === 0) ? "#B19470" : "#fff"; // Snake colour changed to #B19470
-        ctx.fillRect(snake[i].x, snake[i].y, box, box);
-        ctx.strokeStyle = "black";
-        ctx.strokeRect(snake[i].x, snake[i].y, box, box);
-    }
+    // Draw food as circle
+    ctx.fillStyle = "#ef4444";
+    ctx.beginPath();
+    ctx.arc(food.x + box / 2, food.y + box / 2, box / 2 - 1, 0, Math.PI * 2);
+    ctx.fill();
 
-    // Food colour remains red
-    ctx.fillStyle = "red";
-    ctx.fillRect(food.x, food.y, box, box);
+    // Draw snake
+    for (let i = 0; i < snake.length; i++) {
+        ctx.fillStyle = i === 0 ? '#818cf8' : '#6366f1';
+        ctx.beginPath();
+        ctx.roundRect(snake[i].x + 1, snake[i].y + 1, box - 2, box - 2, 4);
+        ctx.fill();
+    }
 
     let snakeX = snake[0].x;
     let snakeY = snake[0].y;
 
-    if (d == "LEFT") snakeX -= box;
-    if (d == "UP") snakeY -= box;
-    if (d == "RIGHT") snakeX += box;
-    if (d == "DOWN") snakeY += box;
+    if (snakeDir === "LEFT")  snakeX -= box;
+    if (snakeDir === "UP")    snakeY -= box;
+    if (snakeDir === "RIGHT") snakeX += box;
+    if (snakeDir === "DOWN")  snakeY += box;
 
+    // Wrap around walls
     if (snakeX < 0) snakeX = canvas.width - box;
     if (snakeX >= canvas.width) snakeX = 0;
     if (snakeY < 0) snakeY = canvas.height - box;
     if (snakeY >= canvas.height) snakeY = 0;
 
-    if (snakeX == food.x && snakeY == food.y) {
-        score++;
+    if (snakeX === food.x && snakeY === food.y) {
+        snakeScore++;
         food = generateFoodPosition();
     } else {
         snake.pop();
     }
 
-    let newHead = {
-        x: snakeX,
-        y: snakeY
-    };
+    const newHead = { x: snakeX, y: snakeY };
 
     if (collision(newHead, snake)) {
-        clearInterval(game);
-        displayBanner("Game Over! Your score is " + score);
-        setTimeout(() => {
-            location.reload(); // Reload the page to restart the game
-        }, 3000); // 3 seconds delay before reloading
+        clearInterval(snakeGameInterval);
+        displayBanner("Game Over! Score: " + snakeScore);
+        setTimeout(() => initSnakeGame(), 3000);
+        return;
     }
 
     snake.unshift(newHead);
-
-    document.getElementById("score2").innerHTML = "Score: " + score;
+    document.getElementById("score2").textContent = "Score: " + snakeScore;
 }
 
 function collision(head, array) {
     for (let i = 0; i < array.length; i++) {
-        if (head.x == array[i].x && head.y == array[i].y) {
-            return true;
-        }
+        if (head.x === array[i].x && head.y === array[i].y) return true;
     }
     return false;
 }
 
 function displayBanner(message) {
-    let banner = document.getElementById("banner");
+    const banner = document.getElementById("banner");
     banner.innerHTML = message;
     banner.style.display = "block";
 }
 
 function togglePause() {
+    if (!snakeStarted) return;
     gamePaused = !gamePaused;
-    let pauseButton = document.getElementById("pauseButton2");
-    pauseButton.textContent = gamePaused ? "Resume" : "Pause";
+    document.getElementById("pauseButton2").textContent = gamePaused ? "Resume" : "Pause";
 }
 
 document.getElementById("pauseButton2").addEventListener("click", togglePause);
 
-let game = setInterval(draw, 100);
+// Key handler — use event.key instead of deprecated keyCode
+document.addEventListener("keydown", function (event) {
+    const key = event.key;
 
+    // Prevent page scrolling with arrow keys when snake is active
+    if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(key)) {
+        event.preventDefault();
+    }
+
+    if (key === 'ArrowLeft'  && snakeDir !== "RIGHT") snakeDir = "LEFT";
+    else if (key === 'ArrowUp'    && snakeDir !== "DOWN")  snakeDir = "UP";
+    else if (key === 'ArrowRight' && snakeDir !== "LEFT")  snakeDir = "RIGHT";
+    else if (key === 'ArrowDown'  && snakeDir !== "UP")    snakeDir = "DOWN";
+    else if (key === 'p' || key === 'P') { togglePause(); return; }
+    else return;
+
+    // First keypress — start the game
+    if (!snakeStarted) {
+        snakeStarted = true;
+        document.getElementById('snake-start-msg').style.opacity = '0';
+        document.getElementById('pauseButton2').disabled = false;
+    }
+});

@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GameHub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -14,18 +17,29 @@
     <nav class="navbar">
         <div class="logo">GameHub</div>
         <ul class="nav-links">
-            <li><a href="#" onclick="showGame('tictactoe')">Tic Tac Toe</a></li>
-            <li><a href="#" onclick="showGame('snake')">Snake</a></li>
+            <li><a href="#" id="nav-tictactoe" class="nav-btn active" onclick="showGame('tictactoe')">Tic Tac Toe</a></li>
+            <li><a href="#" id="nav-snake" class="nav-btn" onclick="showGame('snake')">Snake</a></li>
         </ul>
     </nav>
 
     <!-- Tic Tac Toe Section -->
     <div id="tictactoe" class="game-container">
+        <h1 class="game-title">Tic Tac Toe</h1>
         <div class="scoreboard">
-            <div class="score-item"><span>Player</span> <span id="player">0</span></div>
-            <div class="score-item"><span>Tie</span> <span id="tie">0</span></div>
-            <div class="score-item"><span>Computer</span> <span id="computer">0</span></div>
+            <div class="score-item">
+                <span class="score-label">You</span>
+                <span id="player" class="score-value">0</span>
+            </div>
+            <div class="score-item">
+                <span class="score-label">Tie</span>
+                <span id="tie" class="score-value">0</span>
+            </div>
+            <div class="score-item">
+                <span class="score-label">CPU</span>
+                <span id="computer" class="score-value">0</span>
+            </div>
         </div>
+        <div id="ttt-status" class="ttt-status">Your turn</div>
         <div class="grid-container">
             <div class="grid-item" data-index="0"></div>
             <div class="grid-item" data-index="1"></div>
@@ -41,10 +55,14 @@
 
     <!-- Snake Game Section -->
     <div id="snake" class="game-container2" style="display: none;">
-        <h1>Snake Game</h1>
+        <h1 class="game-title">Snake</h1>
+        <div id="snake-start-msg" class="snake-start-msg">Press an arrow key to start</div>
         <canvas id="gameCanvas2" width="400" height="400"></canvas>
-        <button id="pauseButton2">Pause</button>
-        <div id="score2">Score: 0</div>
+        <div class="snake-controls">
+            <button id="pauseButton2">Pause</button>
+            <div id="score2">Score: 0</div>
+        </div>
+        <div id="banner"></div>
     </div>
 
     <script src="script.js"></script>
